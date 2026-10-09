@@ -12,13 +12,14 @@ import { Star, Eye, Calendar, User, Palette, BookOpen, Layers, Sparkles } from "
 export const revalidate = 30; // ISR 30 seconds
 
 interface Props {
-  params: {
+  params: Promise<{
     slug: string;
-  };
+  }>;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const webtoon = await getWebtoonBySlug(params.slug);
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const { slug } = await props.params;
+  const webtoon = await getWebtoonBySlug(slug);
   if (!webtoon) {
     return {
       title: "عمل غير موجود",
@@ -60,8 +61,9 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function WebtoonDetailPage({ params }: Props) {
-  const webtoon = await getWebtoonBySlug(params.slug);
+export default async function WebtoonDetailPage(props: Props) {
+  const { slug } = await props.params;
+  const webtoon = await getWebtoonBySlug(slug);
 
   if (!webtoon) {
     notFound();

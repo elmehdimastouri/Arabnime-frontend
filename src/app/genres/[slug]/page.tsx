@@ -10,20 +10,21 @@ import { Tag } from "lucide-react";
 export const revalidate = 60;
 
 interface Props {
-  params: {
+  params: Promise<{
     slug: string;
-  };
-  searchParams: {
+  }>;
+  searchParams: Promise<{
     page?: string;
-  };
+  }>;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const resolvedParams = await props.params;
   const allGenres = await getGenres();
-  const currentGenre = allGenres.find((g) => g.slug === params.slug);
-  const genreTitle = currentGenre ? currentGenre.name : params.slug;
+  const currentGenre = allGenres.find((g) => g.slug === resolvedParams.slug);
+  const genreTitle = currentGenre ? currentGenre.name : resolvedParams.slug;
 
-  const canonicalUrl = `https://arabnime.com/genres/${params.slug}`;
+  const canonicalUrl = `https://arabnime.com/genres/${resolvedParams.slug}`;
   const desc = `تصفح وقراءة جميع أعمال المانهوا والويب تون التابعة لتصنيف ${genreTitle} المترجمة للعربية بجودة عالية على Arabnime.`;
 
   return {
@@ -41,9 +42,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function GenreArchivePage({ params, searchParams }: Props) {
-  const page = parseInt(searchParams.page || "1", 10);
-  const genreSlug = params.slug;
+export default async function GenreArchivePage(props: Props) {
+  const [resolvedParams, resolvedSearchParams] = await Promise.all([
+    props.params,
+    props.searchParams,
+  ]);
+  const page = parseInt(resolvedSearchParams.page || "1", 10);
+  const genreSlug = resolvedParams.slug;
 
   const [{ items, total, totalPages }, allGenres] = await Promise.all([
     getWebtoons({ page, per_page: 24, genre: genreSlug }),

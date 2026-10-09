@@ -6,13 +6,14 @@ import WebtoonReader from "@/components/WebtoonReader";
 export const revalidate = 120; // ISR 2 minutes
 
 interface Props {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 }
 
-export default async function ChapterPage({ params }: Props) {
-  const data = await getChapterData(params.id);
+export default async function ChapterPage(props: Props) {
+  const { id } = await props.params;
+  const data = await getChapterData(id);
 
   if (!data) {
     notFound();

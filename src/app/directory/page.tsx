@@ -7,21 +7,22 @@ import { Filter, Layers } from "lucide-react";
 export const revalidate = 60;
 
 interface Props {
-  searchParams: {
+  searchParams: Promise<{
     page?: string;
     genre?: string;
     status?: string;
     sort?: string;
     q?: string;
-  };
+  }>;
 }
 
-export default async function DirectoryPage({ searchParams }: Props) {
-  const page = parseInt(searchParams.page || "1", 10);
-  const genre = searchParams.genre || "";
-  const status = searchParams.status || "";
-  const sort = searchParams.sort || "latest";
-  const q = searchParams.q || "";
+export default async function DirectoryPage(props: Props) {
+  const resolvedSearchParams = await props.searchParams;
+  const page = parseInt(resolvedSearchParams.page || "1", 10);
+  const genre = resolvedSearchParams.genre || "";
+  const status = resolvedSearchParams.status || "";
+  const sort = resolvedSearchParams.sort || "latest";
+  const q = resolvedSearchParams.q || "";
 
   const [{ items, total, totalPages }, genres] = await Promise.all([
     getWebtoons({ page, per_page: 24, genre, status, sort, q }),

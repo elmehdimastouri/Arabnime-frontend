@@ -8,21 +8,22 @@ import JsonLd from "@/components/JsonLd";
 export const revalidate = 120; // ISR 2 minutes
 
 interface Props {
-  params: {
+  params: Promise<{
     slug: string;
     chapter: string;
-  };
+  }>;
 }
 
-export async function generateMetadata({ params }: Props): Promise<Metadata> {
-  const data = await getChapterBySlug(params.slug, params.chapter);
+export async function generateMetadata(props: Props): Promise<Metadata> {
+  const { slug, chapter } = await props.params;
+  const data = await getChapterBySlug(slug, chapter);
   if (!data) {
     return {
       title: "الفصل غير موجود",
     };
   }
 
-  const chapterNum = data.chapter_number || params.chapter;
+  const chapterNum = data.chapter_number || chapter;
   const webtoonTitle = data.webtoon.title;
   const canonicalUrl = `https://arabnime.com/webtoon/${data.webtoon.slug}/${data.slug || chapterNum}`;
   const desc = `اقرأ مانهوا ${webtoonTitle} الفصل ${chapterNum} مترجم بجودة فائقة HD وسرعة تصفح عالية بدون إعلانات مزعجة على منصة Arabnime.`;
@@ -56,14 +57,15 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export default async function WebtoonChapterPage({ params }: Props) {
-  const data = await getChapterBySlug(params.slug, params.chapter);
+export default async function WebtoonChapterPage(props: Props) {
+  const { slug, chapter } = await props.params;
+  const data = await getChapterBySlug(slug, chapter);
 
   if (!data) {
     notFound();
   }
 
-  const chapterNum = data.chapter_number || params.chapter;
+  const chapterNum = data.chapter_number || chapter;
   const canonicalUrl = `https://arabnime.com/webtoon/${data.webtoon.slug}/${data.slug || chapterNum}`;
   const seriesUrl = `https://arabnime.com/webtoon/${data.webtoon.slug}`;
 
