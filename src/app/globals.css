@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --font-cairo: 'Cairo', system-ui, -apple-system, sans-serif;
+  }
+
+  body {
+    background-color: #080c14;
+    color: #f1f5f9;
+    font-family: var(--font-cairo);
+    direction: rtl;
+    text-align: right;
+    overflow-x: hidden;
+  }
+
+  /* Ensure English / Latin titles inside RTL don't flip word orders */
+  .latin-title, [lang="en"], [dir="ltr"] {
+    unicode-bidi: isolate;
+  }
+
+  /* Custom Sleek Scrollbar */
+  ::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  ::-webkit-scrollbar-track {
+    background: #0b1120;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: #1e293b;
+    border-radius: 4px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: #334155;
+  }
+}
+
+/* Reader continuous scroll container */
+.reader-container img {
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+  max-width: 900px;
+  height: auto;
+  user-select: none;
+  -webkit-user-drag: none;
+}
